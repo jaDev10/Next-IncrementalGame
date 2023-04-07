@@ -505,16 +505,16 @@ export default function Home() {
 
     setMonster({
       ...monster,
-      level: storedMonsterLevel ? JSON.parse(storedMonsterLevel) : 0,
+      level: storedMonsterLevel ? JSON.parse(storedMonsterLevel) : 1,
       maxHealth: storedMonsterMaxHealth
         ? JSON.parse(storedMonsterMaxHealth)
-        : 0,
+        : 100,
       currentHealth: storedMonsterCurrentHealth
         ? JSON.parse(storedMonsterCurrentHealth)
-        : 0,
+        : 100,
       cpsMultiplier: storedMonsterMultiplier
         ? JSON.parse(storedMonsterMultiplier)
-        : 0,
+        : 1,
     });
 
     setItems({
