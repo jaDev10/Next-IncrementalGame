@@ -1,7 +1,7 @@
 'use client';
 
 interface itemsProps {
-    buyItemFunction: any
+    buyItemFunction: Function
     itemID : number
     itemFlag: boolean
     itemName: string

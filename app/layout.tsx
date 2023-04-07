@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import './globals.css'
+import MainNav from './MainNav'
 
 export default function RootLayout({
   children,
@@ -12,7 +14,12 @@ export default function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
-      <body>{children}</body>
+      <body>
+        <div className='h-screen bg-backgroundMain'>
+        <MainNav />
+        {children}
+        </div>
+        </body>
     </html>
   )
 }

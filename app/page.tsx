@@ -16,6 +16,8 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
+
+  const [totalScore, setTotalScore] = useState(0);
   const [score, setScore] = useState(0);
   const [knight, setKnight] = useState(
     {
@@ -88,7 +90,7 @@ export default function Home() {
   const [ascensionLevel, setAscensionLevel] = useState(0);
 
   //this const uses states, probably why it works with refreshing the UI?
-  const totalCPS = (knight.incrementAmount * knight.amount + farm.incrementAmount * farm.amount + village.incrementAmount * village.amount + kingdom.incrementAmount*kingdom.amount) * monster.cpsMultiplier;
+  const totalCPS = (knight.incrementAmount * knight.amount + farm.incrementAmount * farm.amount + village.incrementAmount * village.amount + kingdom.incrementAmount*kingdom.amount) * monster.cpsMultiplier * (ascensionLevel + 1);
   
   const [timer, setTimer] = useState(0);
   const [saveTimer, setSaveTimer] = useState(0);
@@ -120,6 +122,8 @@ export default function Home() {
 useEffect(() => {
   if(saveTimer >= 5){
     setSaveTimer(0);
+    localStorage.setItem("totalScore", JSON.stringify(totalScore));
+    localStorage.setItem("ascension", JSON.stringify(ascensionLevel));
     localStorage.setItem("score", JSON.stringify(score));
     localStorage.setItem("knight", JSON.stringify(knight.amount));
     localStorage.setItem("knightCost", JSON.stringify(knight.cost));
@@ -147,12 +151,14 @@ useEffect(() => {
       itemsArray.push(value)
   })
   localStorage.setItem("items", JSON.stringify(itemsArray));
-  console.log(itemsArray)
   }
 }, [saveTimer])
 
   function addScore(value:number){
     setScore(score => score + value);
+    if(value > 0){
+      setTotalScore(totalScore => totalScore + value);
+    }
   }
 
   function addKnight(addValue:number){
@@ -171,7 +177,13 @@ useEffect(() => {
     setKingdom({...kingdom, amount: kingdom.amount + addValue, cost: Math.round(kingdom.cost * 3)});
   }
 
-  function resetScores(){
+  function resetScores(fullReset:boolean = false){
+    if(fullReset){
+      setTotalScore(0);
+      setAscensionLevel(0);
+      localStorage.setItem("totalScore", JSON.stringify(0));
+      localStorage.setItem("ascension", JSON.stringify(0));
+    }
     setScore(0);
     setKnight({...knight,amount: 0, cost: 10, incrementAmount:1});
     setFarm({...farm, amount: 0, cost: 50, incrementAmount:2});
@@ -219,7 +231,19 @@ useEffect(() => {
   }
 
   function ascend(){
-    alert("function in progresss")
+    setAscensionLevel(calculateAscension)
+    resetScores(false)
+  }
+
+  function calculateAscension(){
+    let tempNumber = 0;
+    tempNumber = Math.floor((totalScore - (ascensionLevel * 10000000))  / 10000000)
+    if(tempNumber > ascensionLevel){
+    return tempNumber;
+    }
+    else {
+      return ascensionLevel;
+    }
   }
 
   function buyKnight(){
@@ -365,6 +389,8 @@ useEffect(() => {
 
   //LOADGAME
   useEffect(() => {
+    const storedTotalScore = localStorage.getItem("totalScore");
+    const storedAscension = localStorage.getItem("ascension");
     const storedScore = localStorage.getItem("score");
     const storedKnight = localStorage.getItem("knight")
     const storedKnightCost = localStorage.getItem("knightCost")
@@ -389,6 +415,8 @@ useEffect(() => {
     const parsedItems = storedItems ? JSON.parse(storedItems) : 0
 
     
+    setTotalScore(storedTotalScore ? JSON.parse(storedTotalScore) : 0);
+    setAscensionLevel(storedAscension ? JSON.parse(storedAscension) : 0);
     setScore(storedScore ? JSON.parse(storedScore) : 0);
     setKnight({...knight,amount : storedKnight ? JSON.parse(storedKnight) : 0, cost: storedKnightCost? JSON.parse(storedKnightCost) : 0, incrementAmount: storedKnightInc ? JSON.parse(storedKnightInc) : 0});
     setFarm({...farm, amount : storedFarm ? JSON.parse(storedFarm) : 0, cost: storedFarmCost? JSON.parse(storedFarmCost) : 0,incrementAmount: storedFarmInc ? JSON.parse(storedFarmInc) : 0});
@@ -406,8 +434,19 @@ useEffect(() => {
       <div className='bg-backgroundMain'>
         
         <div className='flex flex-col min-h-[25vh] items-center'>
-          <h1 className='m-6 text-2xl font-bold font-mono'>NEXTJS IDLE GAME</h1>
-          <h1 className='text-2xl font-bold font-mono'>Total CPS: {totalCPS}</h1>
+          <h1 className='m-4 text-2xl font-bold font-mono'>CONQUEST CLICKER</h1>
+          <h1 className='text-2xl font-bold font-mono group'>Total CPS: {totalCPS}
+          <div className='absolute  bg-grayish p-2 rounded-sm shadow-md drop-shadow-md italic invisible group-hover:visible'>
+            <p>Each Knight: {knight.incrementAmount * monster.cpsMultiplier * (ascensionLevel + 1)}/s</p>
+            <p>Each Farm: {farm.incrementAmount * monster.cpsMultiplier * (ascensionLevel + 1)}/s</p>
+            <p>Each Village: {village.incrementAmount * monster.cpsMultiplier * (ascensionLevel + 1)}/s</p>
+            <p>Each Kingdom: {kingdom.incrementAmount * monster.cpsMultiplier * (ascensionLevel + 1)}/s</p>
+            <p>Total Gold Accumulated: {Math.round(totalScore)}</p>
+            <p>Ascension level: {ascensionLevel}</p>
+
+
+          </div>
+          </h1>
         </div>  
 
         <div className='flex flex-row min-h-[50vh]'>
@@ -477,6 +516,7 @@ useEffect(() => {
       <div className = "flex flex-col border items-center p-4">
         <h1 className='mt-2 mx-4'>Shop</h1>
           <div className='grid grid-cols-3 grid-rows-4 mt-6 gap-4 '>
+
           <ItemsBtn buyItemFunction = {buyItem} itemID = {1} itemFlag = {items.Sword1} itemName = "Iron Sword" itemCost = "1000" tooltipText='Each knight now produces twice as much gold' />
           <ItemsBtn buyItemFunction = {buyItem} itemID = {2} itemFlag = {items.Sword2} itemName = "Gold Sword" itemCost = "10000" tooltipText='Each knight now produces twice as much gold' />
           <ItemsBtn buyItemFunction = {buyItem} itemID = {3} itemFlag = {items.Sword3} itemName = "Rune Sword" itemCost = "100,000" tooltipText='Each knight now produces 3x as much gold' />
@@ -493,10 +533,16 @@ useEffect(() => {
       </div>
       </div>
       </div>
-      <div className='min-h-[25vh]'>
-      <button onClick={resetScores} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked ">Reset</button>
-      <button onClick={() => addScore(100000)} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked ">Cheat</button>
-      <button onClick={() => ascend()} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked ">Ascend</button>
+      <div className=''>
+      <button onClick={() => resetScores(true)} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked my-4">Reset</button>
+      <button onClick={() => addScore(10000000)} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked my-4">Cheat</button>
+      <button onClick={() => ascend()} className="border border-purpleish rounded-md p-1 mx-2 text-lg bg-buttonMain text-white hover:bg-buttonClicked group"><h1>Ascend</h1>
+      <div className='absolute -mt-[2rem] ml-[4.2rem] bg-grayish p-2 rounded-sm shadow-md drop-shadow-md italic invisible group-hover:visible'><p>Gain {calculateAscension() - ascensionLevel} ascension levels</p>
+      <p>Earn a new ascension level every 10 million gold</p>
+      <p>Each ascension level gives you a +1x multiplier</p>
+      <p>All clickers and upgrades will reset on ascension</p></div>
+
+      </button>
       </div>
       </div>
     </main>
