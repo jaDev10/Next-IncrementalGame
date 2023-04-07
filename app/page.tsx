@@ -481,26 +481,26 @@ export default function Home() {
     setKnight({
       ...knight,
       amount: storedKnight ? JSON.parse(storedKnight) : 0,
-      cost: storedKnightCost ? JSON.parse(storedKnightCost) : 0,
-      incrementAmount: storedKnightInc ? JSON.parse(storedKnightInc) : 0,
+      cost: storedKnightCost ? JSON.parse(storedKnightCost) : 10,
+      incrementAmount: storedKnightInc ? JSON.parse(storedKnightInc) : 1,
     });
     setFarm({
       ...farm,
       amount: storedFarm ? JSON.parse(storedFarm) : 0,
-      cost: storedFarmCost ? JSON.parse(storedFarmCost) : 0,
-      incrementAmount: storedFarmInc ? JSON.parse(storedFarmInc) : 0,
+      cost: storedFarmCost ? JSON.parse(storedFarmCost) : 50,
+      incrementAmount: storedFarmInc ? JSON.parse(storedFarmInc) : 2,
     });
     setVillage({
       ...village,
       amount: storedVillage ? JSON.parse(storedVillage) : 0,
-      cost: storedVillageCost ? JSON.parse(storedVillageCost) : 0,
-      incrementAmount: storedVillageInc ? JSON.parse(storedVillageInc) : 0,
+      cost: storedVillageCost ? JSON.parse(storedVillageCost) : 100,
+      incrementAmount: storedVillageInc ? JSON.parse(storedVillageInc) : 3,
     });
     setKingdom({
       ...kingdom,
       amount: storedKingdom ? JSON.parse(storedKingdom) : 0,
-      cost: storedKingdomCost ? JSON.parse(storedKingdomCost) : 0,
-      incrementAmount: storedKingdomInc ? JSON.parse(storedKingdomInc) : 0,
+      cost: storedKingdomCost ? JSON.parse(storedKingdomCost) : 200,
+      incrementAmount: storedKingdomInc ? JSON.parse(storedKingdomInc) : 4,
     });
 
     setMonster({
